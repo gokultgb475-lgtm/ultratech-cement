@@ -11,6 +11,25 @@
     <title>Ultratech Cement Madurai | Authorized Dealer - Fast Delivery</title>
     <script>
       (function (location) {
+        if (!location.hostname.endsWith('.github.io')) {
+          return;
+        }
+
+        const segments = location.pathname.split('/').filter(Boolean);
+        const repo = segments[0];
+        const remainder = segments.slice(1).join('/');
+
+        if (!repo) {
+          return;
+        }
+
+        if (remainder === '' || remainder === 'index.html') {
+          location.replace(`${location.origin}/${repo}/docs/${location.search}${location.hash}`);
+        }
+      })(window.location);
+    </script>
+    <script>
+      (function (location) {
         if (location.search[1] !== '/') {
           return;
         }

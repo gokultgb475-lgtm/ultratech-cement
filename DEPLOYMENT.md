@@ -20,7 +20,7 @@ This lets you test the production build locally before deploying.
 
 ### Option A: GitHub Pages
 
-Use the built site inside the `docs/` folder and let GitHub Pages serve it directly from the `main` branch.
+Use the built site inside the `docs/` folder. This repo is set up so GitHub Pages can publish from the `main` branch root, and the root page will forward visitors into the built `docs/` site automatically.
 
 #### 1. Build the Pages version
 ```bash
@@ -47,7 +47,7 @@ git push origin main
 - Go to `Settings` -> `Pages`
 - Set `Source` to `Deploy from a branch`
 - Set `Branch` to `main`
-- Set `Folder` to `/docs`
+- Set `Folder` to `/ (root)`
 
 #### 5. Wait for Pages to publish
 - GitHub usually publishes within a minute or two after the push
