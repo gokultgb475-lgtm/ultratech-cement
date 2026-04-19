@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react';
 import { db } from '../../services/firebase';
 import { collection, query, onSnapshot, updateDoc, doc, Query, Timestamp } from 'firebase/firestore';
-import { CheckCircle, Clock, Truck, Phone, MapPin, AlertCircle } from 'lucide-react';
+import { CheckCircle, Clock, Truck, Phone, MapPin, AlertCircle, Mail, MessageSquare } from 'lucide-react';
 
 interface Order {
   id: string;
   name: string;
   phone: string;
+  email?: string;
   items: Array<{ id: string; name: string; quantity: number; price: number }>;
   total: number;
   location: string;
+  notes?: string;
+  requirement?: string;
+  quantityRequested?: number | null;
+  orderType?: 'quote' | 'purchase';
+  source?: string;
   status: 'pending' | 'processing' | 'delivered';
   createdAt: Timestamp;
 }
@@ -62,9 +68,15 @@ export function OrdersManagement() {
               id: orderDoc.id,
               name: data.name ?? 'Unknown customer',
               phone: data.phone ?? 'Not provided',
+              email: typeof data.email === 'string' ? data.email : '',
               items: Array.isArray(data.items) ? data.items : [],
               total: typeof data.total === 'number' ? data.total : 0,
               location: data.location ?? 'Not provided',
+              notes: typeof data.notes === 'string' ? data.notes : '',
+              requirement: typeof data.requirement === 'string' ? data.requirement : '',
+              quantityRequested: typeof data.quantityRequested === 'number' ? data.quantityRequested : null,
+              orderType: data.orderType === 'quote' || data.orderType === 'purchase' ? data.orderType : 'purchase',
+              source: typeof data.source === 'string' ? data.source : '',
               status:
                 data.status === 'processing' || data.status === 'delivered' || data.status === 'pending'
                   ? data.status
@@ -205,6 +217,12 @@ export function OrdersManagement() {
                       <Phone className="w-4 h-4 text-[#FF4D2E]" />
                       <span className="text-[#8B919D]">{order.phone}</span>
                     </div>
+                    {order.email && (
+                      <div className="flex items-center gap-3 text-sm">
+                        <Mail className="w-4 h-4 text-[#FF4D2E]" />
+                        <span className="text-[#8B919D]">{order.email}</span>
+                      </div>
+                    )}
                     <div className="flex items-center gap-3 text-sm">
                       <MapPin className="w-4 h-4 text-[#FF4D2E]" />
                       <span className="text-[#8B919D]">{order.location}</span>
@@ -213,15 +231,35 @@ export function OrdersManagement() {
 
                   {/* Items */}
                   <div className="corp-panel-soft p-4">
-                    <p className="text-xs font-medium text-[#5A6474] uppercase mb-3">Items</p>
-                    <div className="space-y-2">
-                      {order.items.map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between text-sm">
-                          <span className="text-[#E8ECF4]">{item.name} x {item.quantity}</span>
-                          <span className="text-[#FF4D2E]">₹{(item.price * item.quantity).toLocaleString()}</span>
-                        </div>
-                      ))}
-                    </div>
+                    <p className="text-xs font-medium text-[#5A6474] uppercase mb-3">
+                      {order.orderType === 'quote' ? 'Quote Request' : 'Items'}
+                    </p>
+                    {order.items.length > 0 ? (
+                      <div className="space-y-2">
+                        {order.items.map((item, idx) => (
+                          <div key={idx} className="flex items-center justify-between text-sm">
+                            <span className="text-[#E8ECF4]">{item.name} x {item.quantity}</span>
+                            <span className="text-[#FF4D2E]">₹{(item.price * item.quantity).toLocaleString()}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="space-y-2 text-sm">
+                        <p className="text-[#E8ECF4]">No cart items attached.</p>
+                        {order.requirement && (
+                          <p className="text-[#8B919D]">Requested product: {order.requirement}</p>
+                        )}
+                        {order.quantityRequested && (
+                          <p className="text-[#8B919D]">Requested quantity: {order.quantityRequested} bags</p>
+                        )}
+                      </div>
+                    )}
+                    {order.notes && (
+                      <div className="mt-4 flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-3 text-sm">
+                        <MessageSquare className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#FF4D2E]" />
+                        <span className="text-[#8B919D]">{order.notes}</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Total and Date */}

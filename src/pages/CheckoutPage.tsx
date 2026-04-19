@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
-import { db } from '../services/firebase';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { createOrder } from '../services/orders';
 import {
   Package, ArrowLeft, ShoppingCart, ChevronRight, Shield, Truck, Clock,
   CreditCard, Wallet, Building2, Smartphone, CheckCircle, Tag, MapPin, Phone, User, Mail, MessageSquare, Gift
@@ -30,6 +29,7 @@ export function CheckoutPage() {
   const [coupon, setCoupon] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<typeof OFFERS[0] | null>(null);
   const [placing, setPlacing] = useState(false);
+  const [orderReference, setOrderReference] = useState('');
   const [form, setForm] = useState({ name: '', phone: '', email: '', address: '', city: 'Madurai', pincode: '', notes: '' });
 
   const deliveryFee = cartTotal >= 25000 ? 0 : 250;
@@ -48,14 +48,24 @@ export function CheckoutPage() {
   const placeOrder = async () => {
     setPlacing(true);
     try {
-      await addDoc(collection(db, 'orders'), {
-        name: form.name, phone: form.phone, email: form.email,
+      const orderId = await createOrder({
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
         location: `${form.address}, ${form.city} - ${form.pincode}`,
         items: cart.map(i => ({ id: i.id, name: i.name, quantity: i.quantity, price: i.price })),
-        total: grandTotal, subtotal: cartTotal, gst, delivery: deliveryFee, discount,
-        paymentMethod, coupon: appliedCoupon?.code || '', notes: form.notes,
-        status: 'pending', createdAt: Timestamp.now()
+        total: grandTotal,
+        subtotal: cartTotal,
+        gst,
+        delivery: deliveryFee,
+        discount,
+        paymentMethod,
+        coupon: appliedCoupon?.code || '',
+        notes: form.notes,
+        source: 'checkout',
+        orderType: 'purchase'
       });
+      setOrderReference(orderId.slice(-8).toUpperCase());
       clearCart();
       setStep('success');
     } catch { alert('Failed to place order. Please try again.'); }
@@ -84,6 +94,7 @@ export function CheckoutPage() {
           <h1 className="font-display font-bold text-3xl text-white mb-3">Order Placed!</h1>
           <p className="text-[#8B919D] mb-2">Your cement order has been confirmed and our team will contact you shortly.</p>
           <p className="text-[#FF4D2E] font-display font-bold text-2xl mb-6">₹{grandTotal.toLocaleString()}</p>
+          {orderReference && <p className="text-sm text-[#E8ECF4] mb-2">Reference: #{orderReference}</p>}
           <p className="text-xs text-[#5A6474] mb-8">Payment: {PAYMENT_METHODS.find(p => p.id === paymentMethod)?.label}</p>
           <Link to="/" className="btn-primary inline-flex items-center gap-2">Back to Home <ChevronRight className="w-4 h-4" /></Link>
         </div>

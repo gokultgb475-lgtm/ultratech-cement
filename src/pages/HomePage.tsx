@@ -2,11 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { db } from '../services/firebase';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { useCart } from '../contexts/CartContext';
 import { products } from '../data/products';
 import { assetPath } from '../lib/asset-path';
+import { createOrder } from '../services/orders';
 import { 
   ShoppingCart, Plus, Phone, MapPin, 
   Truck, Package, Shield, CheckCircle,
@@ -21,7 +20,7 @@ export function HomePage() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
-  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [successNotice, setSuccessNotice] = useState<{ title: string; description: string } | null>(null);
   const [navScrolled, setNavScrolled] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -239,8 +238,7 @@ export function HomePage() {
     setIsPlacingOrder(true);
 
     try {
-      // Save order to Firestore
-      await addDoc(collection(db, 'orders'), {
+      const orderId = await createOrder({
         name: formData.name,
         phone: formData.phone,
         email: formData.email,
@@ -252,16 +250,18 @@ export function HomePage() {
           price: item.price
         })),
         total: cartTotal,
-        status: 'pending',
-        createdAt: Timestamp.now()
+        source: 'homepage-cart',
+        orderType: 'purchase'
       });
 
-      setOrderSuccess(true);
+      setSuccessNotice({
+        title: 'Order placed successfully!',
+        description: `Saved to Firebase as #${orderId.slice(-8).toUpperCase()}.`
+      });
       clearCart();
       setFormData({ name: '', phone: '', email: '', requirement: '', quantity: '', message: '', location: '' });
 
-      // Reset success message after 5 seconds
-      setTimeout(() => setOrderSuccess(false), 5000);
+      setTimeout(() => setSuccessNotice(null), 5000);
     } catch (err) {
       console.error('Error placing order:', err);
       alert('Failed to place order. Please try again.');
@@ -270,10 +270,52 @@ export function HomePage() {
     }
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Thank you for your inquiry! We will contact you within 1 hour.');
-    setFormData({ name: '', phone: '', email: '', requirement: '', quantity: '', message: '', location: '' });
+    setIsPlacingOrder(true);
+
+    try {
+      const selectedProduct = products.find((product) => product.id === formData.requirement);
+      const quantityRequested = formData.quantity ? Number(formData.quantity) : null;
+      const items = selectedProduct && quantityRequested
+        ? [{
+            id: selectedProduct.id,
+            name: selectedProduct.name,
+            quantity: quantityRequested,
+            price: selectedProduct.price
+          }]
+        : [];
+
+      const total = items.length > 0
+        ? items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+        : 0;
+
+      const orderId = await createOrder({
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        location: 'Quote request from homepage',
+        items,
+        total,
+        notes: formData.message,
+        requirement: selectedProduct?.name ?? formData.requirement,
+        quantityRequested,
+        source: 'quote-form',
+        orderType: 'quote'
+      });
+
+      setSuccessNotice({
+        title: 'Quote request sent!',
+        description: `Saved to Firebase as #${orderId.slice(-8).toUpperCase()}.`
+      });
+      setFormData({ name: '', phone: '', email: '', requirement: '', quantity: '', message: '', location: '' });
+      setTimeout(() => setSuccessNotice(null), 5000);
+    } catch (err) {
+      console.error('Error saving quote request:', err);
+      alert('Failed to save your quote request. Please try again.');
+    } finally {
+      setIsPlacingOrder(false);
+    }
   };
 
   return (
@@ -282,14 +324,14 @@ export function HomePage() {
       <div className="grain-overlay" />
       
       {/* Success Message */}
-      {orderSuccess && (
+      {successNotice && (
         <div className="success-toast fixed top-20 left-1/2 -translate-x-1/2 z-[70] py-4 px-6 bg-[#141C2D] border border-emerald-500/30 rounded-2xl flex items-center gap-3 shadow-[0_20px_50px_rgba(16,185,129,0.2)]">
           <div className="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
             <CheckCircle className="w-5 h-5 text-emerald-400" />
           </div>
           <div>
-            <p className="font-medium text-white">Order placed successfully!</p>
-            <p className="text-sm text-[#8B919D]">Admin will review it shortly.</p>
+            <p className="font-medium text-white">{successNotice.title}</p>
+            <p className="text-sm text-[#8B919D]">{successNotice.description}</p>
           </div>
         </div>
       )}
@@ -1166,8 +1208,21 @@ export function HomePage() {
                         placeholder="Tell us about your project..."
                       />
                     </div>
-                    <button type="submit" className="btn-primary w-full flex items-center justify-center gap-2 text-base py-4">
-                      <MessageSquare className="w-4 h-4" /> Send inquiry
+                    <button
+                      type="submit"
+                      disabled={isPlacingOrder}
+                      className="btn-primary w-full flex items-center justify-center gap-2 text-base py-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isPlacingOrder ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <MessageSquare className="w-4 h-4" /> Send inquiry
+                        </>
+                      )}
                     </button>
                   </>
                 )}
