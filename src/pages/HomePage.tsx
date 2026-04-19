@@ -6,6 +6,7 @@ import { db } from '../services/firebase';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { useCart } from '../contexts/CartContext';
 import { products } from '../data/products';
+import { assetPath } from '../lib/asset-path';
 import { 
   ShoppingCart, Plus, Phone, MapPin, 
   Truck, Package, Shield, CheckCircle,
@@ -479,7 +480,7 @@ export function HomePage() {
                     <div className="hero-bag-glow" />
                     <div className="hero-bag-backplate" />
                     <img
-                      src="/hero_cement_bag.png"
+                      src={assetPath('/hero_cement_bag.png')}
                       alt="Ultratech Cement Bag"
                       className="relative z-10 w-64 sm:w-72 lg:w-80 float-animation drop-shadow-[0_40px_60px_rgba(0,0,0,0.35)]"
                     />
@@ -785,7 +786,7 @@ export function HomePage() {
             <div className="whyus-image relative">
               <div className="relative rounded-[28px] overflow-hidden group">
                 <img 
-                  src="/why_dealer.jpg" 
+                  src={assetPath('/why_dealer.jpg')} 
                   alt="Cement Warehouse" 
                   className="w-full h-[400px] lg:h-[520px] object-cover transition-transform duration-700 group-hover:scale-105"
                 />
@@ -901,7 +902,7 @@ export function HomePage() {
             <div className="deliv-image order-1 lg:order-2">
               <div className="relative rounded-[28px] overflow-hidden group">
                 <img 
-                  src="/delivery_truck.jpg" 
+                  src={assetPath('/delivery_truck.jpg')} 
                   alt="Delivery Truck" 
                   className="w-full h-[400px] lg:h-[520px] object-cover transition-transform duration-700 group-hover:scale-105"
                 />
@@ -967,7 +968,7 @@ export function HomePage() {
             <div className="test-image">
               <div className="relative rounded-[28px] overflow-hidden group">
                 <img 
-                  src="/testimonial_portrait.jpg" 
+                  src={assetPath('/testimonial_portrait.jpg')} 
                   alt="Site Supervisor" 
                   className="w-full h-[400px] lg:h-[520px] object-cover transition-transform duration-700 group-hover:scale-105"
                 />
@@ -1182,7 +1183,7 @@ export function HomePage() {
       <section ref={qualityRef} className="relative h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden">
         <div className="qual-bg absolute inset-0">
           <img 
-            src="/quality_plant.jpg" 
+            src={assetPath('/quality_plant.jpg')} 
             alt="Cement Manufacturing Plant" 
             className="w-full h-full object-cover"
           />
@@ -1234,7 +1235,7 @@ export function HomePage() {
             <div className="reg-map">
               <div className="relative rounded-[28px] overflow-hidden group">
                 <img 
-                  src="/madurai_map.jpg" 
+                  src={assetPath('/madurai_map.jpg')} 
                   alt="Madurai City" 
                   className="w-full h-[300px] lg:h-[420px] object-cover transition-transform duration-700 group-hover:scale-105"
                 />
@@ -1331,4 +1332,3 @@ export function HomePage() {
     </div>
   );
 }
-
