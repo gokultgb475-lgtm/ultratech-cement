@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { LogIn, AlertCircle, Package, ChevronRight, ShieldCheck } from 'lucide-react';
 
@@ -180,12 +180,12 @@ export function LoginPage() {
               </div>
             </div>
 
-            <a
-              href="/"
+            <Link
+              to="/"
               className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[#FF8C42] transition-colors hover:text-[#FF4D2E]"
             >
               Back to website <ChevronRight className="h-4 w-4" />
-            </a>
+            </Link>
           </div>
         </div>
       </div>

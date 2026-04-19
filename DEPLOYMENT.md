@@ -18,7 +18,44 @@ This lets you test the production build locally before deploying.
 
 ## Deployment Options
 
-### Option A: Firebase Hosting (Recommended)
+### Option A: GitHub Pages
+
+Use the built site inside the `docs/` folder and let GitHub Pages serve it directly from the `main` branch.
+
+#### 1. Build the Pages version
+```bash
+npm run build:pages
+```
+
+#### 2. Copy the build into `docs/`
+```bash
+rm -rf docs
+mkdir docs
+cp -R dist/. docs/
+touch docs/.nojekyll
+```
+
+#### 3. Push the latest code
+```bash
+git add docs
+git commit -m "Update GitHub Pages build"
+git push origin main
+```
+
+#### 4. Enable Pages in GitHub
+- Open your repository on GitHub
+- Go to `Settings` -> `Pages`
+- Set `Source` to `Deploy from a branch`
+- Set `Branch` to `main`
+- Set `Folder` to `/docs`
+
+#### 5. Wait for Pages to publish
+- GitHub usually publishes within a minute or two after the push
+
+Your site will be live at:
+`https://gokultgb475-lgtm.github.io/ultratech-cement/`
+
+### Option B: Firebase Hosting (Recommended)
 
 #### 1. Install Firebase CLI
 ```bash
@@ -48,7 +85,7 @@ firebase deploy
 
 Your site will be live at: `https://<project-id>.firebaseapp.com`
 
-### Option B: Vercel (Easiest)
+### Option C: Vercel (Easiest)
 
 #### 1. Install Vercel CLI
 ```bash
@@ -62,7 +99,7 @@ vercel
 
 Follow the prompts. Vercel handles building automatically.
 
-### Option C: Netlify
+### Option D: Netlify
 
 #### 1. Connect Repository
 Go to [Netlify](https://netlify.com) and connect your Git repository.
@@ -79,7 +116,7 @@ VITE_FIREBASE_AUTH_DOMAIN=your_domain
 ...
 ```
 
-### Option D: Docker (Self-hosted)
+### Option E: Docker (Self-hosted)
 
 #### 1. Create Dockerfile
 ```dockerfile

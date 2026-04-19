@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { OrdersManagement } from '../components/admin/OrdersManagement';
 import { ProductsManagement } from '../components/admin/ProductsManagement';
@@ -171,12 +171,12 @@ export function AdminDashboard() {
         </div>
 
         <div className="mt-10 flex items-center justify-end">
-          <a
-            href="/"
+          <Link
+            to="/"
             className="inline-flex items-center gap-2 text-sm font-medium text-[#FF8C42] transition-colors hover:text-[#FF4D2E]"
           >
             Back to website <ChevronRight className="h-4 w-4" />
-          </a>
+          </Link>
         </div>
       </main>
     </div>

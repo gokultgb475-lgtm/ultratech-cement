@@ -10,8 +10,10 @@ import { LoginPage } from './pages/LoginPage';
 import { AdminDashboard } from './pages/AdminDashboard';
 
 function App() {
+  const routerBasename = import.meta.env.BASE_URL === '/' ? undefined : import.meta.env.BASE_URL;
+
   return (
-    <Router>
+    <Router basename={routerBasename}>
       <AuthProvider>
         <CartProvider>
           <Routes>

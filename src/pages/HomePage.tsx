@@ -314,7 +314,7 @@ export function HomePage() {
             <a href="#delivery" className="nav-link text-[#8B919D] hover:text-white transition-colors text-sm font-medium">Delivery</a>
             <a href="#regions" className="nav-link text-[#8B919D] hover:text-white transition-colors text-sm font-medium">Areas</a>
             <a href="#contact" className="nav-link text-[#8B919D] hover:text-white transition-colors text-sm font-medium">Contact</a>
-            <a href="/login" className="nav-link text-[#8B919D] hover:text-white transition-colors text-sm font-medium">Admin</a>
+            <Link to="/login" className="nav-link text-[#8B919D] hover:text-white transition-colors text-sm font-medium">Admin</Link>
           </div>
           
           <div className="flex items-center gap-3">
@@ -348,7 +348,7 @@ export function HomePage() {
             <a href="#delivery" onClick={() => setIsMenuOpen(false)} className="block py-3 text-[#E8ECF4] font-medium border-b border-white/5">Delivery</a>
             <a href="#regions" onClick={() => setIsMenuOpen(false)} className="block py-3 text-[#E8ECF4] font-medium border-b border-white/5">Areas</a>
             <a href="#contact" onClick={() => setIsMenuOpen(false)} className="block py-3 text-[#E8ECF4] font-medium border-b border-white/5">Contact</a>
-            <a href="/login" onClick={() => setIsMenuOpen(false)} className="block py-3 text-[#FF4D2E] font-medium">Admin Portal →</a>
+            <Link to="/login" onClick={() => setIsMenuOpen(false)} className="block py-3 text-[#FF4D2E] font-medium">Admin Portal →</Link>
           </div>
         )}
       </nav>
@@ -1331,5 +1331,4 @@ export function HomePage() {
     </div>
   );
 }
-
 
