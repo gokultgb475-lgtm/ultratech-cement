@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.codex
+.env
+.env.local
+.env.*.local
+.vscode/
+.DS_Store
+*.log
+lint_output.txt
